@@ -1,0 +1,22 @@
+{
+  "name": "node-express-example",
+  "version": "1.0.0",
+  "description": "A simple node express module",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index"
+  },
+  "keywords": [
+    "node",
+    "express",
+    "simple",
+    "nodejs"
+  ],
+  "author": "Harsh Verma",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.17.1",
+    "morgan": "^1.9.1"
+  }
+}
