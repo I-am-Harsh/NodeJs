@@ -7,7 +7,7 @@ const dbname = 'confusion';
 
 MongoClient.connect(url ,{useNewUrlParser: true, useUnifiedTopology: true}).then((client) => {
     // assert is used for checking the values
-    assert.equal(err,null);
+    assert.strictEqual(err,null);
 
     console.log('Server is connected');
      const db = client.db(dbname);
