@@ -11,6 +11,26 @@ var dishRouter = require('./routes/dishRouter');
 var leaderRouter = require('./routes/leaderRouter');
 var promoRouter = require('./routes/promoRouter');
 
+const mongoose = require('mongoose');
+const Dishes = require('./models/dishes');
+
+const url = 'mongodb://localhost:27017/confusion';
+
+mongoose.set('useNewUrlParser', true);
+mongoose.set('useFindAndModify', false);
+mongoose.set('useCreateIndex', true);
+mongoose.set('useUnifiedTopology', true);
+
+
+const connect = mongoose.connect(url)
+connect.then( (db) =>{
+  console.log("Server is connected succesfully");
+  }, (err) =>{
+    console.log(err);
+});
+
+
+
 
 var app = express();
 
@@ -29,6 +49,10 @@ app.use('/users', usersRouter);
 app.use('/dishes', dishRouter);
 app.use('/leaders', leaderRouter);
 app.use('/promotions', promoRouter);
+
+
+
+
 
 // catch 404 and forward to error handler
 app.use((req, res, next) => {

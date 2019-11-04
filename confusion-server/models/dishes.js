@@ -1,4 +1,7 @@
 const mongoose = require('mongoose');
+require('mongoose-currency').loadType(mongoose);
+
+const currency = mongoose.Types.Currency;
 
 const Schema = mongoose.Schema;
 
@@ -31,31 +34,33 @@ var dishSchema = new Schema({
         type: String,
         required: true
     },
+    image : {
+        type : String,
+        required : true
+    },
+    category : {
+        type : String,
+        required : true
+    },
+    label : {
+        type : String,
+        default : ''
+    },
+    price : {
+        type : currency,
+        required : true,
+        min : 0
+    },
+    featured : {
+        type : Boolean,
+        default : false
+    },
+    
     comments:[commentSchema]
 }, {
     timestamps: true
 });
 
-
-
-// var users = new Schema({
-//     user : {
-//         name : String,
-//         email : String,
-
-//     },
-
-//     cars = [carNum]
-// });
-
-
-// var carNum = new Schema ({
-//     car :{
-//         plate : Number,
-//         type : String,
-//         ownerName : String
-//     }
-// });
 
 var Dishes = mongoose.model('Dish',dishSchema);
 

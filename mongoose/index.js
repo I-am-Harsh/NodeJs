@@ -10,7 +10,7 @@ mongoose.set('useFindAndModify', false);
 mongoose.set('useCreateIndex', true);
 mongoose.set('useUnifiedTopology', true);
 
-// the below method can also be used to remove the depraction warning removal.
+// the below method can also be used to remove the depraction warning.
 // const connect = mongoose.connect(url ,{useNewUrlParser: true, useUnifiedTopology: true});
 
 const connect = mongoose.connect(url);
