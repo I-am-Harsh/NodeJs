@@ -42,6 +42,28 @@ app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
+
+auth = (req,res,next) => {
+  console.log(req.headers);
+
+  const authHeader = req.headers.authorization;
+
+  // if no header then we challenge the client
+  if(!authHeader){
+    var err = new Error('You need authentication to access the section');
+    res.setHeader('WWW-Authenticate','Basic');
+    err.status = 401;
+    return next(err);
+  }
+
+  var auth = new Buffer(authHeader.split(' ')[1],'base64')
+
+}
+
+// authentication
+
+app.use(auth);
+
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', indexRouter);

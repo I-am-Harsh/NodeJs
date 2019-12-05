@@ -2,59 +2,116 @@ const body = require('body-parser');
 const express = require('express');
 const promoRouter = express.Router();
 
+const Promotions = require('../models/promotions');
+
 promoRouter.use(body.json());
 
 promoRouter.route('/')
-
-.all((req,res,next) =>{
-    res.statusCode = 200;
-    res.setHeader('Content-type','text/plain');
-    next();
-})
+// var promoId = req.body.promoId
 
 .get((req,res) =>{
-    res.end(`This is a ${req.method} request`)
+    Promotions.find({})
+    .then((result) => {
+        if(result != null){
+            res.statusCode = 200;
+            res.setHeader('Content-type','application/json');
+            res.json(result);
+        }
+        else{
+            err = new Error(`There are no promotions available`);
+            err.status = 200;
+            return(next(err));
+        }
+    }, (err) => next(err))
+    .catch((err) => next(err));
 })
+
+
+.post((req,res) =>{
+    Promotions.create(req.body)
+    .then((result) =>{
+        res.statusCode = 200;
+        res.setHeader('Content-type','application/json');
+        res.send(result);
+    },(err) => next(err))
+    .catch((err) => next(err))
+})
+
 
 .put((req,res) =>{
     res.end(`This is a ${req.method} request`);
 })
 
 .delete((req,res) =>{
-    res.end(`This is a ${req.method} request`);
-})
-
-.post((req,res) =>{
-    res.end(`This is a ${req.method} request`);
+    Promotions.deleteMany({})
+    .then((result) => {
+        res.statusCode = 200;
+        res.setHeader('Content-type','application/json');
+        res.json('All deleted');
+    }, (err) => next(err))
+    .catch((err) => next(err))
 });
 
 
+
 promoRouter.route('/:promoId')
-.all((req,res,next) =>{
-    res.statusCode = 200;
-    res.setHeader('Content-type','text/plain');
-    // looks for additional function that match the requests
-    next();
+.get((req,res) =>{
+    var promoId = req.params.promoId;
+    Promotions.findById({_id : promoId})
+    .then((result) =>{
+        if(result != null){
+            res.statusCode = 200;
+            res.setHeader('Content-type','application/json');
+            res.json(result);
+        }
+        else{
+            err = new Error(`This PromoId : ${req.params.promoId} is not available`);
+            err.status = 200;
+            err.next()
+        }
+    }, (err) => next(err))
+    .catch((err) => next(err))
 })
 
-.get((req,res) =>{
-    
-    res.end('The selected promo id is :' + req.params.promoId);
-})
 
 .post((req,res) =>{
-    res.statusCode = 403;
-    res.end(`The ${req.method} was executed.  This operation is not supported. The selected promo id is : ${req.params.promoId}`);
-})
-
-.put((req,res) =>{
     res.write(`The ${req.method} was executed. The selected promo id is :  ${req.body.name} `);
     res.end(`The selected promo id is : ${req.params.promoId}`)
 })
 
-.delete((req,res) =>{
+
+.put((req,res) =>{
     
-    res.end(`The ${req.method} was executed on ${req.params.promoId}. `);
+    Promotions.findByIdAndUpdate(req.params.promoId,{
+        $set : req.body
+    }, 
+        {new : true}
+    )
+    .then((result) =>{
+        console.log(`Promotions created : ${req.body}`);
+        res.statusCode = 200;
+        res.setHeader('Content-type',"application/json");
+        res.json(result);
+    }, (err) => next(err))
+    .catch((err) => next(err))
+})
+
+.delete((req,res) =>{
+    var promoId = req.params.promoId;
+    Promotions.deleteMany({_id : promoId})
+    .then((result) =>{
+        if(result != null){
+            res.statusCode = 200;
+            res.setHeader('Content-type','application/json');
+            res.json('Deleted');
+        }
+        else{
+            err = new Error(`This PromoId : ${req.params.promoId} is not available`);
+            err.status = 200;
+            err.next()
+        }
+    }, (err) => next(err))
+    .catch((err) => next(err))
 });
 
 
