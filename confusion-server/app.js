@@ -41,41 +41,56 @@ app.set('view engine', 'jade');
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
-app.use(cookieParser());
+app.use(cookieParser('this-is-a-key-for-sign'));
 
 auth = (req,res,next) => {
-  console.log(req.headers);
+  console.log(req.signedCookies);
 
-  const authHeader = req.headers.authorization;
-  
-  // if no header then we challenge the client
-  
-  if(!authHeader){
-    var err = new Error('You need authentication to access the section');
-    res.setHeader('WWW-Authenticate','Basic');
-    err.status = 401;
-    return next(err);
+  if(!req.signedCookies.user){
+    const authHeader = req.headers.authorization;
+    // if no header then we challenge the client
+    if(!authHeader){
+      var err = new Error('You need authentication to access the section');
+      res.setHeader('WWW-Authenticate','Basic');
+      err.status = 401;
+      return next(err);
+    }
+    
+    // array of user and pass
+    var auth = new Buffer.from(authHeader.split(' ')[1],'base64').toString().split(':');
+
+    var username = auth[0];
+    var password = auth[1];
+
+    if(username === 'admin' && password ==='pass'){
+      // this will allow the request to pass through the next middleware.
+      // If an error then it won't get ahead.
+
+      // set the cookie
+
+      res.cookie('user','admin',{signed : true});
+      next();
+    }
+
+    else{
+      var err = new Error('Wrong password or username');
+      res.setHeader('WWW-Authenticate','Basic');
+      err.status = 401;
+      return next(err);
+    }
   }
-  
-  // array of user and pass
-  var auth = new Buffer(authHeader.split(' ')[1],'base64').toString().split(':');
-
-  var username = auth[0];
-  var password = auth[1];
-
-  if(username === 'admin' && password ==='pass'){
-    // this will allow the request to pass through the next middleware.
-    // If an error then it won't get ahead.
-    next();
-  }
-
+  // cookie not created then
   else{
-    var err = new Error('Wrong password or username');
-    res.setHeader('WWW-Authenticate','Basic');
-    err.status = 401;
-    return next(err);
+    if(req.signedCookies.user === 'admin'){
+      next();
+    }
+    else{
+      var err = new Error('Wrong password or username');
+      res.setHeader('WWW-Authenticate','Basic');
+      err.status = 401;
+      return next(err);
+    }
   }
-
 }
 
 // authentication
