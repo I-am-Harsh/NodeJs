@@ -3,6 +3,9 @@ var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
+var session = require('express-session');
+var fileStore = require('session-file-store')(session)
+
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
@@ -41,12 +44,20 @@ app.set('view engine', 'jade');
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
-app.use(cookieParser('this-is-a-key-for-sign'));
+// app.use(cookieParser('this-is-a-key-for-sign'));
+
+app.use(session({
+  name : 'session-id',
+  secret : 'this-is-a-key-for-sign',
+  saveUninitialized : false,
+  resave : false,
+  store : new fileStore()
+}))
 
 auth = (req,res,next) => {
-  console.log(req.signedCookies);
+  console.log(req.session);
 
-  if(!req.signedCookies.user){
+  if(!req.session.user){
     const authHeader = req.headers.authorization;
     // if no header then we challenge the client
     if(!authHeader){
@@ -68,7 +79,7 @@ auth = (req,res,next) => {
 
       // set the cookie
 
-      res.cookie('user','admin',{signed : true});
+      req.session.user = 'admin';
       next();
     }
 
@@ -81,7 +92,7 @@ auth = (req,res,next) => {
   }
   // cookie not created then
   else{
-    if(req.signedCookies.user === 'admin'){
+    if(req.session.user === 'admin'){
       next();
     }
     else{
