@@ -46,7 +46,7 @@ app.use(express.urlencoded({ extended: false }));
 // app.use(cookieParser('this-is-a-key-for-sign'));
 
 app.use('/', indexRouter);
-app.use('/users', usersRouter);
+
 app.use(session({
   name : 'session-id',
   secret : 'this-is-a-key-for-sign',
@@ -54,6 +54,8 @@ app.use(session({
   resave : false,
   store : new fileStore()
 }))
+
+app.use('/users', usersRouter);
 
 function auth (req, res, next) {
   console.log(req.session);

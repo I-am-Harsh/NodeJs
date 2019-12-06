@@ -34,7 +34,7 @@ router.post('/signup', (req, res, next) => {
 
 router.post('/login', (req, res, next) => {
   console.log("Session form users.js : " +req)
-  req.session = 'not';
+  // req.session = 'not';
   if(req.session !== 'authenticated') {
     var authHeader = req.headers.authorization;
     
