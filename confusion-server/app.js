@@ -9,7 +9,6 @@ var fileStore = require('session-file-store')(session)
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
-
 var dishRouter = require('./routes/dishRouter');
 var leaderRouter = require('./routes/leaderRouter');
 var promoRouter = require('./routes/promoRouter');
@@ -56,27 +55,26 @@ app.use(session({
   store : new fileStore()
 }))
 
-auth = (req,res,next) => {
+function auth (req, res, next) {
   console.log(req.session);
 
-  if(!req.session.user){
-    var err = new Error('You need authentication to access the section');
-    res.setHeader('WWW-Authenticate','Basic');
-    err.status = 401;
-    return next(err);
+  if(!req.session.user) {
+      var err = new Error('You are not authenticated!');
+      err.status = 403;
+      return next(err);
   }
-  else{
-    if(req.session.user === 'authenticated'){
+  else {
+    if (req.session.user === 'authenticated') {
       next();
     }
-    else{
-      var err = new Error('Wrong password or username');
-      res.setHeader('WWW-Authenticate','Basic');
-      err.status = 401;
+    else {
+      var err = new Error('You are not authenticated!');
+      err.status = 403;
       return next(err);
     }
   }
 }
+
 
 // authentication
 
